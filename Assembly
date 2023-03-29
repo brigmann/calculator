@@ -1,0 +1,137 @@
+section .data
+    num1 db 0
+    num2 db 0
+    op db 0
+    result db 0
+
+section .text
+    global _start
+
+_start:
+    ; Prompt the user for input
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, prompt1
+    mov edx, prompt1_len
+    int 0x80
+
+    ; Read the first number
+    mov eax, 3
+    mov ebx, 0
+    mov ecx, num1
+    mov edx, 2
+    int 0x80
+
+    ; Prompt the user for the operator
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, prompt2
+    mov edx, prompt2_len
+    int 0x80
+
+    ; Read the operator
+    mov eax, 3
+    mov ebx, 0
+    mov ecx, op
+    mov edx, 1
+    int 0x80
+
+    ; Prompt the user for the second number
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, prompt3
+    mov edx, prompt3_len
+    int 0x80
+
+    ; Read the second number
+    mov eax, 3
+    mov ebx, 0
+    mov ecx, num2
+    mov edx, 2
+    int 0x80
+
+    ; Convert the input strings to numbers
+    mov eax, [num1]
+    sub eax, 0x30
+    mov ebx, [num2]
+    sub ebx, 0x30
+
+    ; Perform the arithmetic operation
+    mov al, [op]
+    cmp al, '+'
+    je add
+    cmp al, '-'
+    je sub
+    cmp al, '*'
+    je mul
+    cmp al, '/'
+    je div
+    jmp error
+
+add:
+    add eax, ebx
+    jmp print_result
+
+sub:
+    sub eax, ebx
+    jmp print_result
+
+mul:
+    mul ebx
+    jmp print_result
+
+div:
+    mov edx, 0
+    div ebx
+    jmp print_result
+
+error:
+    ; Display an error message
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, error_msg
+    mov edx, error_msg_len
+    int 0x80
+
+    ; Exit the program
+    mov eax, 1
+    xor ebx, ebx
+    int 0x80
+
+print_result:
+    ; Convert the result to a string
+    add eax, 0x30
+    mov [result], al
+
+    ; Display the result
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, num1
+    mov edx, 1
+    int 0x80
+
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, op
+    mov edx, 1
+    int 0x80
+
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, num2
+    mov edx, 1
+    int 0x80
+
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, equals
+    mov edx, equals_len
+    int 0x80
+
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, result
+    mov edx, 1
+    int 0x80
+
+    ; Exit the program
